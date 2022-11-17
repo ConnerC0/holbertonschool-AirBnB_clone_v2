@@ -51,9 +51,10 @@ class DBStorage:
         elif cls is None:
             for thing in school:
                 sesh_list += self.__session.query(thing).all()
-        for pip in sesh_list:
-            sesh[f"{type(pip).__name__}.{pip.id}"] = pip
-        return sesh
+        for obj in sesh_list:
+            name_id = "{}.{}".format(type(cls).__name__, obj.id)
+            sesh_list.update({"{}".format(name_id): obj})
+        return obj
 
     def new(self, obj):
         """add obj to current sesh"""

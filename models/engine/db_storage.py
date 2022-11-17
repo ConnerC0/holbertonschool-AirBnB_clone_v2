@@ -35,26 +35,23 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """query current sesh all obs (of cls if given)"""
-        school = {
-            City,
-            State,
-            User,
-            Place,
-            Amenity,
-            Review
-        }
-        sesh = {}
-        sesh_list = []
-        if cls in school:
-            sesh_list = self.__session.query(cls).all()
-        elif cls is None:
-            for thing in school:
-                sesh_list += self.__session.query(thing).all()
-        for obj in sesh_list:
-            name_id = "{}.{}".format(type(cls).__name__, obj.id)
-            sesh_list.update({"{}".format(name_id): obj})
-        return obj
+        """
+        Query current database session for all objects of class
+        """
+
+        object_dict = {}
+
+        if cls is not None:
+            for obj in self.__session.query(cls).all():
+                name_id = "{}.{}".format(type(cls).__name__, obj.id)
+                object_dict.update({"{}".format(name_id): obj})
+        else:
+            for name in classes.values():
+                object_list = self.__session.query(name)
+                for obj in object_list:
+                    name_id = "{}.{}".format(type(cls).__name__, obj.id)
+                    object_dict.update({"{}".format(name_id): obj})
+        return object_dict
 
     def new(self, obj):
         """add obj to current sesh"""
@@ -78,6 +75,7 @@ class DBStorage:
                 expire_on_commit=False
             )
         )
+
     def close(self):
         """closes session"""
         self.__session.remove()
